@@ -1,5 +1,5 @@
 # Utiliser une image Python officielle légère
-FROM public.ecr.aws/docker/library/python:3.12-slim
+FROM public.ecr.aws/docker/library/python:3.9-slim
 
 # Définir le répertoire de travail
 WORKDIR /app
