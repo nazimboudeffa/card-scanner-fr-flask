@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Cloner le repo séparément
-RUN git clone https://github.com/nazimboudeffa/card-scanner-fr-flask.git .
+RUN git clone https://github.com/nazimboudeffa/card-scanner-fr-flask.git /app
 
 # Installer les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Exposer le port Flask
 EXPOSE 5000
