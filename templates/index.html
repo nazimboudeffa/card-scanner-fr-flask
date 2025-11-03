@@ -36,6 +36,7 @@
         </div>
 
         <button id="capture" class="btn primary" aria-label="Capturer une image">Capturer</button>
+        <button id="switch_camera" class="btn ghost" type="button">Changer caméra</button>
       </section>
 
       <section class="preview">
@@ -55,6 +56,6 @@
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

@@ -148,6 +148,15 @@ select:focus, input[type="number"]:focus { border-color: var(--primary); box-sha
 .btn.primary:hover { transform: translateY(-1px); }
 .btn.primary:active { transform: translateY(0); }
 
+/* Neutral/ghost style for secondary actions */
+.btn.ghost {
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid rgba(150,160,180,0.28);
+}
+.btn.ghost:hover { border-color: rgba(150,160,180,0.45); transform: translateY(-1px); }
+.btn.ghost:active { transform: translateY(0); }
+
 .preview { display: grid; gap: var(--gap); }
 
 .video-wrap {
