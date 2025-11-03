@@ -20,4 +20,4 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 EXPOSE 5000
 
 # Commande pour lancer l'application
-CMD ["python", "app.py"]
+ENTRYPOINT ["python", "app.py", "--server.port=5000", "--server.address=0.0.0.0"]
