@@ -2,31 +2,58 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Scan d'image - Hash perceptuel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="theme-color" content="#4f8cff">
 </head>
 <body>
-  <h1>📸 Scan d'image (pHash / dHash / aHash / wHash)</h1>
+  <div class="container grid layout">
+    <div class="left grid" style="gap: 18px;">
+      <header class="header">
+        <h1>
+          📸 Scan d'image <span class="muted">(pHash / dHash / aHash / wHash)</span>
+        </h1>
+        <nav>
+          <a class="link subtle" href="/info" title="Informations">Infos</a>
+        </nav>
+      </header>
 
-  <div><a href="/info">[nfo]</a></div>
+      <section class="controls card">
+        <div class="field">
+          <label for="hash_type">Type de hash</label>
+          <select id="hash_type" aria-label="Type de hash">
+            <option value="phash">pHash</option>
+            <option value="dhash">dHash</option>
+            <option value="ahash">aHash</option>
+            <option value="whash">wHash</option>
+          </select>
+        </div>
 
-  <label for="hash_type">Type de hash :</label>
-  <select id="hash_type">
-    <option value="phash">pHash</option>
-    <option value="dhash">dHash</option>
-    <option value="ahash">aHash</option>
-    <option value="whash">wHash</option>
-  </select>
+        <div class="field">
+          <label for="hash_size">Taille du hash</label>
+          <input type="number" id="hash_size" value="16" min="4" max="32" aria-label="Taille du hash">
+        </div>
 
-  <label for="hash_size">Taille du hash :</label>
-  <input type="number" id="hash_size" value="16" min="4" max="32">
+        <button id="capture" class="btn primary" aria-label="Capturer une image">Capturer</button>
+      </section>
 
-  <br><br>
+      <section class="preview">
+        <div class="video-wrap card">
+          <div class="kicker" style="padding: 10px 12px 2px;">
+            <span class="dot"></span> Aperçu caméra
+          </div>
+          <div class="spacer"></div>
+          <div class="video-frame">
+            <video id="video" width="400" height="300" autoplay playsinline aria-label="Flux caméra"></video>
+            <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+          </div>
+        </div>
 
-  <video id="video" width="400" height="300" autoplay></video>
-  <button id="capture">Capturer</button>
-  <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
-
-  <p id="result"></p>
+        <p id="result" class="result card" aria-live="polite" aria-atomic="true" style="min-height: 48px; margin: 0;"></p>
+      </section>
+    </div>
+  </div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
