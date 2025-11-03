@@ -1,18 +1,22 @@
-# Utiliser une image Python officielle légère
-FROM public.ecr.aws/docker/library/python:3.9-slim
+# Image Python officielle slim
+FROM public.ecr.aws/docker/library/python:3.12-slim
 
-# Définir le répertoire de travail
+# Répertoire de travail
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
+# Installer les dépendances système nécessaires
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
-    software-properties-common \
-    && rm -rf /var/lib/apt/lists/* \
-    && git clone https://github.com/nazimboudeffa/card-scanner-fr-flask.git . \
-    && pip3 install -r requirements.txt
+    && rm -rf /var/lib/apt/lists/*
 
-# Exposer le port de Flask
+# Cloner le repo séparément
+RUN git clone https://github.com/nazimboudeffa/card-scanner-fr-flask.git /app
+
+# Installer les dépendances Python
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Exposer le port Flask
 EXPOSE 5000
 
 # Commande pour lancer l'application
