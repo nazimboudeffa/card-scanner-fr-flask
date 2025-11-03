@@ -86,6 +86,10 @@ def find_closest_matches(image_hash, max_distance=10, limit=5):
 def index():
     return render_template('index.html')
 
+@app.route('/info')
+def info():
+    return render_template('info.html')
+
 @app.route('/compare', methods=['POST'])
 def compare():
     try:
