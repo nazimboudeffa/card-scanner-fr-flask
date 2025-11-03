@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan d'image - Hash perceptuel</title>
+</head>
+<body>
+  <h1>📸 Scan d'image (pHash / dHash / aHash / wHash)</h1>
+
+  <label for="hash_type">Type de hash :</label>
+  <select id="hash_type">
+    <option value="phash">pHash</option>
+    <option value="dhash">dHash</option>
+    <option value="ahash">aHash</option>
+    <option value="whash">wHash</option>
+  </select>
+
+  <label for="hash_size">Taille du hash :</label>
+  <input type="number" id="hash_size" value="16" min="4" max="32">
+
+  <br><br>
+
+  <video id="video" width="400" height="300" autoplay></video>
+  <button id="capture">Capturer</button>
+  <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+
+  <p id="result"></p>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
