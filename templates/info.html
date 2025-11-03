@@ -2,27 +2,300 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Scan d'image - Hash perceptuel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>À propos - Scan d'image</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="theme-color" content="#4f8cff">
+  <style>
+    .hero {
+      text-align: center;
+      padding: 48px 24px 32px;
+      background: radial-gradient(800px 600px at 50% -100px, rgba(79,140,255,0.18), transparent 70%);
+      border-radius: var(--card-radius);
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 40px);
+      margin: 0 0 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--ok) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .tagline {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--muted);
+      margin: 0 auto;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .feature-card {
+      padding: 20px;
+      display: grid;
+      gap: 10px;
+    }
+    .feature-card .icon {
+      font-size: 32px;
+      line-height: 1;
+    }
+    .feature-card h3 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .feature-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .section {
+      margin-bottom: 28px;
+    }
+    .section-title {
+      font-size: 22px;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title .emoji { font-size: 24px; }
+    .hash-list {
+      display: grid;
+      gap: 12px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .hash-list li {
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid rgba(150,160,180,0.2);
+      border-radius: 10px;
+      transition: border-color .2s ease, transform .2s ease;
+    }
+    .hash-list li:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+    .hash-list strong {
+      color: var(--primary);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .cta-section {
+      background: linear-gradient(135deg, rgba(79,140,255,0.15), rgba(61,220,151,0.15));
+      border: 2px solid var(--primary);
+      padding: 32px 28px;
+      text-align: center;
+      border-radius: var(--card-radius);
+      margin-bottom: 28px;
+    }
+    .cta-section h2 {
+      margin: 0 0 12px;
+      font-size: clamp(24px, 4vw, 32px);
+    }
+    .cta-section .pitch {
+      font-size: 16px;
+      color: var(--muted);
+      margin: 0 auto 24px;
+      max-width: 560px;
+      line-height: 1.6;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .btn-cta.donate {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(255, 107, 107, 0.4);
+    }
+    .btn-cta.donate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(255, 107, 107, 0.5);
+    }
+    .btn-cta.github {
+      background: var(--surface);
+      border: 2px solid rgba(150,160,180,0.3);
+      color: var(--text);
+    }
+    .btn-cta.github:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(150,160,180,0.25);
+      transition: .2s ease;
+      background: var(--surface);
+    }
+    .back-link:hover {
+      color: var(--text);
+      border-color: var(--primary);
+      transform: translateX(-3px);
+    }
+    .impact-note {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 18px;
+    }
+    .usage-note {
+      padding: 16px 18px;
+      background: rgba(255, 176, 32, 0.1);
+      border-left: 4px solid var(--warn);
+      border-radius: 8px;
+      margin-top: 14px;
+    }
+    .usage-note p { margin: 0; font-size: 14px; color: var(--text); }
+  </style>
 </head>
 <body>
-    <h1>ℹ️ Informations sur le Scan d'image (pHash / dHash / aHash / wHash)</h1>
-    <p>Cette application permet de capturer des images à partir de la caméra de votre appareil et de générer des hash perceptuels en utilisant différentes méthodes : pHash, dHash, aHash et wHash.</p>
-    <p>Les hash perceptuels sont utilisés pour identifier des images similaires en se basant sur leur contenu visuel plutôt que sur des données binaires exactes. Cela permet de détecter des images qui ont été modifiées ou compressées tout en restant visuellement similaires.</p>
-    <h2>Types de hash disponibles :</h2>
-    <ul>
-        <li><strong>pHash (Perceptual Hash)</strong> : Utilise des transformations de fréquence pour capturer les caractéristiques visuelles globales de l'image.</li>
-        <li><strong>dHash (Difference Hash)</strong> : Calcule les différences entre les pixels adjacents pour créer un hash basé sur les variations de luminosité.</li>
-        <li><strong>aHash (Average Hash)</strong> : Calcule la moyenne des valeurs de pixel et crée un hash en fonction de la comparaison de chaque pixel avec cette moyenne.</li>
-        <li><strong>wHash (Wavelet Hash)</strong> : Utilise des transformations en ondelettes pour capturer les détails à différentes échelles dans l'image.</li>
-    </ul>
-    <h2>Utilisation</h2>
-    <p>Pour utiliser l'application, sélectionnez le type de hash souhaité et la taille du hash, puis cliquez sur le bouton "Capturer" pour prendre une photo avec votre caméra. Le hash généré sera affiché à l'écran.</p>
-    <p>Actuellement seul le pHash est pris en charge.</p>
-    <h2>Contribuer</h2>
-    <p>Ce projet est open source et vous êtes encouragé à contribuer. Vous pouvez proposer des améliorations, signaler des bugs ou ajouter de nouvelles fonctionnalités.</p>
-    <a href="https://github.com/nazimboudeffa/card-scanner-fr-flask">https://github.com/nazimboudeffa/card-scanner-fr-flask</a>
-    <h2>Faire un don</h2>
-    <p>Pour faire un don, vous pouvez utiliser le lien suivant :</p>
-    <a href="https://www.tipeee.com/nazimboudeffa">https://www.tipeee.com/nazimboudeffa</a>
+  <div class="container">
+    <div class="left grid" style="gap: 18px; max-width: 900px; margin: 0 auto;">
+      
+      <a href="/" class="back-link">
+        <span>←</span> Retour au scanner
+      </a>
+
+      <div class="hero">
+        <h1>📸 Scanner de cartes intelligent</h1>
+        <p class="tagline">
+          Comparez et identifiez des images instantanément grâce aux hash perceptuels
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card card">
+          <div class="icon">🚀</div>
+          <h3>Rapide et efficace</h3>
+          <p>Scannez et comparez des images en temps réel directement depuis votre smartphone ou ordinateur</p>
+        </div>
+        
+        <div class="feature-card card">
+          <div class="icon">🔐</div>
+          <h3>100% privé</h3>
+          <p>Aucune donnée n'est envoyée à des serveurs tiers. Tout fonctionne localement sur votre appareil</p>
+        </div>
+        
+        <div class="feature-card card">
+          <div class="icon">🎯</div>
+          <h3>Précis</h3>
+          <p>Détecte les images similaires même après compression, recadrage ou légères modifications</p>
+        </div>
+      </div>
+
+      <section class="section">
+        <h2 class="section-title">
+          <span class="emoji">🧮</span>
+          Types de hash disponibles
+        </h2>
+        <ul class="hash-list">
+          <li>
+            <strong>pHash (Perceptual Hash)</strong>
+            Utilise des transformations de fréquence (DCT) pour capturer les caractéristiques visuelles globales. Très résistant aux modifications.
+          </li>
+          <li>
+            <strong>dHash (Difference Hash)</strong>
+            Calcule les différences entre pixels adjacents. Rapide et efficace pour détecter les variations de luminosité.
+          </li>
+          <li>
+            <strong>aHash (Average Hash)</strong>
+            Compare chaque pixel à la moyenne globale. Simple et performant pour les comparaisons basiques.
+          </li>
+          <li>
+            <strong>wHash (Wavelet Hash)</strong>
+            Utilise des transformations en ondelettes pour capturer les détails à différentes échelles.
+          </li>
+        </ul>
+        <div class="usage-note">
+          <p><strong>⚠️ Note :</strong> Actuellement, seul le <strong>pHash</strong> est entièrement implémenté. Les autres algorithmes seront ajoutés prochainement.</p>
+        </div>
+      </section>
+
+      <div class="cta-section card">
+        <h2>💝 Soutenez ce projet</h2>
+        <p class="pitch">
+          Ce scanner est <strong>gratuit et open source</strong>. Votre soutien permet de développer de nouvelles fonctionnalités, d'améliorer la précision des algorithmes et de maintenir le projet à jour. 
+          Chaque contribution, aussi petite soit-elle, fait la différence !
+        </p>
+        <div class="cta-buttons">
+          <a href="https://www.tipeee.com/nazimboudeffa" target="_blank" rel="noopener" class="btn-cta donate">
+            ❤️ Faire un don
+          </a>
+          <a href="https://github.com/nazimboudeffa/card-scanner-fr-flask" target="_blank" rel="noopener" class="btn-cta github">
+            ⭐ Voir sur GitHub
+          </a>
+        </div>
+        <p class="impact-note">
+          Merci de contribuer à rendre la technologie accessible à tous 🙏
+        </p>
+      </div>
+
+      <section class="section card" style="padding: 20px;">
+        <h2 class="section-title">
+          <span class="emoji">🛠️</span>
+          Comment utiliser
+        </h2>
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.8; color: var(--muted);">
+          <li>Sélectionnez le type de hash et la taille désirée</li>
+          <li>Cliquez sur "Changer caméra" pour basculer entre avant/arrière</li>
+          <li>Pointez vers l'image à scanner</li>
+          <li>Cliquez sur "Capturer" pour générer le hash</li>
+          <li>Les correspondances trouvées s'afficheront instantanément</li>
+        </ol>
+      </section>
+
+      <section class="section card" style="padding: 20px;">
+        <h2 class="section-title">
+          <span class="emoji">🤝</span>
+          Contribuer
+        </h2>
+        <p style="margin: 0 0 12px; color: var(--muted); line-height: 1.7;">
+          Ce projet est <strong>open source</strong> et accueille toutes les contributions ! Vous pouvez :
+        </p>
+        <ul style="margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.8;">
+          <li>Proposer de nouvelles fonctionnalités</li>
+          <li>Signaler des bugs ou problèmes</li>
+          <li>Améliorer la documentation</li>
+          <li>Implémenter les algorithmes dHash, aHash et wHash</li>
+          <li>Optimiser les performances</li>
+        </ul>
+        <p style="margin: 14px 0 0;">
+          <a href="https://github.com/nazimboudeffa/card-scanner-fr-flask" target="_blank" rel="noopener" style="color: var(--primary); text-decoration: none; font-weight: 600;">
+            👉 Contribuer sur GitHub
+          </a>
+        </p>
+      </section>
+
+    </div>
+  </div>
 </body>
 </html>
