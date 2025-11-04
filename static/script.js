@@ -2,9 +2,14 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const captureButton = document.getElementById('capture');
 const switchButton = document.getElementById('switch_camera');
+const loadImageButton = document.getElementById('load_image');
+const fileInput = document.getElementById('file_input');
 const result = document.getElementById('result');
 const hashType = document.getElementById('hash_type');
 const hashSize = document.getElementById('hash_size');
+const maxDistance = document.getElementById('max_distance');
+const capturedImage = document.getElementById('captured_image');
+const capturedWrap = document.getElementById('captured_wrap');
 
 let currentStream = null;
 let currentFacing = 'environment'; // start with back camera for scanning
@@ -91,50 +96,85 @@ if (switchButton) {
     });
 }
 
+// Load image from file
+if (loadImageButton && fileInput) {
+    loadImageButton.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        console.log('Loaded image size:', file.size, 'bytes');
+
+        // Display the loaded image
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            capturedImage.src = e.target.result;
+            capturedWrap.style.display = 'block';
+
+            // Process the image
+            await processImage(file);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+async function processImage(imageBlob) {
+    const formData = new FormData();
+    formData.append('image', imageBlob, 'image.jpg');
+    formData.append('hash_type', hashType.value);
+    formData.append('hash_size', hashSize.value);
+    formData.append('max_distance', maxDistance.value);
+
+    const response = await fetch('/compare', {
+        method: 'POST',
+        body: formData
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        console.log('Compare response:', data);
+        let html = '';
+        if (data.exact_match) {
+            html += '✅ <strong>Match exact trouvé!</strong><br>';
+        } else if (data.closest_match) {
+            html += '🔍 <strong>Correspondance la plus proche:</strong><br>';
+        } else {
+            html += '🆕 <strong>Aucune correspondance trouvée</strong><br>';
+        }
+
+        html += `Hash: ${data.hash}<br>`;
+        html += `Type: ${data.hash_type} (size: ${data.hash_size})<br><br>`;
+
+        if (data.closest_match) {
+            html += `<strong>Carte la plus proche:</strong><br>`;
+            html += `Nom: ${data.closest_match.name}<br>`;
+            html += `Distance: ${data.closest_match.distance}<br>`;
+            html += `Hash DB: ${data.closest_match.hash}<br>`;
+        }
+
+        result.innerHTML = html;
+    } else {
+        const errorData = await response.json().catch(() => ({}));
+        result.textContent = `❌ Erreur: ${errorData.error || 'Erreur serveur'}`;
+        console.error("Erreur serveur", response.status, errorData);
+    }
+}
+
 captureButton.addEventListener('click', async () => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convertir le canvas en Blob
+    // Display the captured image
+    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.95);
+    capturedImage.src = imageDataUrl;
+    capturedWrap.style.display = 'block';
+
+    // Convertir le canvas en Blob with high quality
     canvas.toBlob(async (blob) => {
-        const formData = new FormData();
-        formData.append('image', blob, 'capture.jpg');
-        formData.append('hash_type', hashType.value);
-        formData.append('hash_size', hashSize.value);
-
-        const response = await fetch('/compare', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            
-            let html = '';
-            
-            if (data.exact_match) {
-                html += '✅ <strong>Match exact trouvé!</strong><br>';
-            } else if (data.total_matches > 0) {
-                html += '🔍 <strong>Correspondances proches:</strong><br>';
-            } else {
-                html += '🆕 <strong>Aucune correspondance trouvée</strong><br>';
-            }
-            
-            html += `Hash: ${data.hash}<br>`;
-            html += `Type: ${data.hash_type} (size: ${data.hash_size})<br><br>`;
-            
-            if (data.closest_matches && data.closest_matches.length > 0) {
-                html += '<strong>Meilleures correspondances:</strong><br>';
-                for (const [index, match] of data.closest_matches.entries()) {
-                    html += `${index + 1}. ${match.name} (distance: ${match.distance})<br>`;
-                }
-            }
-            
-            result.innerHTML = html;
-        } else {
-            const errorData = await response.json().catch(() => ({}));
-            result.textContent = `❌ Erreur: ${errorData.error || 'Erreur serveur'}`;
-            console.error("Erreur serveur", response.status, errorData);
-        }
-    }, 'image/jpeg');
+        console.log('Captured image size:', blob.size, 'bytes');
+        await processImage(blob);
+    }, 'image/jpeg', 0.95);
 });

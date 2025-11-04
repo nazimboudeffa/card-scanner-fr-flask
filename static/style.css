@@ -112,7 +112,8 @@ h1 {
 }
 
 @media (max-width: 680px) {
-  .controls { grid-template-columns: 1fr; }
+  .controls { grid-template-columns: 1fr 1fr; }
+  .controls .btn { grid-column: span 2; }
 }
 
 .field { display: grid; gap: 8px; }
@@ -159,7 +160,7 @@ select:focus, input[type="number"]:focus { border-color: var(--primary); box-sha
 
 .preview { display: grid; gap: var(--gap); }
 
-.video-wrap {
+.video-wrap, .captured-wrap {
   padding: 12px;
 }
 .video-frame {

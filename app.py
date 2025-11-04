@@ -3,9 +3,14 @@ from PIL import Image
 import imagehash
 import sqlite3
 import io
+import logging
 
 app = Flask(__name__)
 DB_PATH = "database.db"
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialise la base de données
 def init_db():
@@ -41,46 +46,40 @@ def hash_exists(image_hash):
     return exists
 
 # Trouve les hashs les plus proches dans la base
-def find_closest_matches(image_hash, max_distance=10, limit=5):
+def find_closest_match(image_hash, max_distance=10):
     """
-    Trouve les hashs les plus proches en calculant la distance de Hamming
-    
+    Trouve le hash le plus proche en calculant la distance de Hamming
     Args:
         image_hash: Le hash de l'image à comparer
         max_distance: Distance maximale pour considérer un match
-        limit: Nombre maximum de résultats à retourner
-    
     Returns:
-        Liste de tuples (id, name, hash, distance) triés par distance
+        Un dict (id, name, hash, distance) du match le plus proche ou None
     """
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, name, hash FROM cards")
     all_cards = c.fetchall()
     conn.close()
-    
-    # Convertir le hash en objet ImageHash pour calculer la distance
+
     input_hash = imagehash.hex_to_hash(image_hash)
-    
-    # Calculer la distance pour chaque carte
-    distances = []
+    closest = None
+    min_distance = None
     for card_id, name, card_hash in all_cards:
         try:
             db_hash = imagehash.hex_to_hash(card_hash)
-            distance = input_hash - db_hash  # Distance de Hamming
+            distance = input_hash - db_hash
             if distance <= max_distance:
-                distances.append({
-                    'id': card_id,
-                    'name': name,
-                    'hash': card_hash,
-                    'distance': distance
-                })
+                if min_distance is None or distance < min_distance:
+                    min_distance = distance
+                    closest = {
+                        'id': card_id,
+                        'name': name,
+                        'hash': card_hash,
+                        'distance': distance
+                    }
         except Exception:
             continue
-    
-    # Trier par distance et limiter les résultats
-    distances.sort(key=lambda x: x['distance'])
-    return distances[:limit]
+    return closest
 
 @app.route('/')
 def index():
@@ -95,8 +94,7 @@ def compare():
     try:
         hash_type = request.form.get("hash_type", "phash")
         hash_size = int(request.form.get("hash_size", 16))
-        max_distance = int(request.form.get("max_distance", 50))  # Increased default
-        limit = int(request.form.get("limit", 5))
+        max_distance = int(request.form.get("max_distance", 150))  # Increased default for camera captures
 
         if 'image' not in request.files:
             return jsonify({'error': 'Aucune image reçue'}), 400
@@ -107,25 +105,30 @@ def compare():
 
         # Calcul du hash
         image_hash = compute_hash(pil_img, hash_type=hash_type, hash_size=hash_size)
+        logger.info(f"Computed hash: {image_hash}, type: {hash_type}, size: {hash_size}")
 
         # Comparaison avec la base - vérification exacte
         exact_match = hash_exists(image_hash)
         
-        # Trouver les correspondances les plus proches
-        closest_matches = find_closest_matches(image_hash, max_distance=max_distance, limit=limit)
+        # Trouver la correspondance la plus proche
+        closest_match = find_closest_match(image_hash, max_distance=max_distance)
+        
+        if closest_match:
+            logger.info(f"Closest match: {closest_match['name']} with distance {closest_match['distance']}")
+        else:
+            logger.info(f"No match found within max_distance {max_distance}")
 
         return jsonify({
             'exact_match': exact_match,
             'hash': image_hash,
             'hash_type': hash_type,
             'hash_size': hash_size,
-            'closest_matches': closest_matches,
-            'total_matches': len(closest_matches)
+            'closest_match': closest_match
         })
     except Exception as e:
-        app.logger.error(f"Error in /compare: {str(e)}")
+        logger.error(f"Error in /compare: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     init_db()  # Initialize database on startup
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)

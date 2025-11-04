@@ -35,8 +35,15 @@
           <input type="number" id="hash_size" value="16" min="4" max="32" aria-label="Taille du hash">
         </div>
 
+        <div class="field">
+          <label for="max_distance">Distance max</label>
+          <input type="number" id="max_distance" value="150" min="0" max="500" aria-label="Distance maximale">
+        </div>
+
         <button id="capture" class="btn primary" aria-label="Capturer une image">Capturer</button>
         <button id="switch_camera" class="btn ghost" type="button">Changer caméra</button>
+        <button id="load_image" class="btn ghost" type="button">Charger une image</button>
+        <input type="file" id="file_input" accept="image/*" style="display:none;">
       </section>
 
       <section class="preview">
@@ -48,6 +55,16 @@
           <div class="video-frame">
             <video id="video" width="400" height="300" autoplay playsinline aria-label="Flux caméra"></video>
             <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+          </div>
+        </div>
+
+        <div class="captured-wrap card" id="captured_wrap" style="display:none;">
+          <div class="kicker" style="padding: 10px 12px 2px;">
+            📸 Image capturée
+          </div>
+          <div class="spacer"></div>
+          <div class="video-frame">
+            <img id="captured_image" alt="Capturée" style="display:block; width:100%; height:auto; object-fit: contain; background: #000; border-radius: 12px;">
           </div>
         </div>
 
