@@ -168,6 +168,7 @@ select:focus, input[type="number"]:focus { border-color: var(--primary); box-sha
   overflow: hidden;
   border-radius: 12px;
   border: 1px solid rgba(150,160,180,0.2);
+  background: #000;
 }
 .video-frame video {
   display: block;
@@ -181,8 +182,9 @@ select:focus, input[type="number"]:focus { border-color: var(--primary); box-sha
   width: 100%;
   height: auto;
   max-width: 100%;
+  max-height: 400px;
   object-fit: contain;
-  background: #000;
+  margin: 0 auto;
 }
 
 .result {
