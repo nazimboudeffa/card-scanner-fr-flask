@@ -46,14 +46,15 @@ def hash_exists(image_hash):
     return exists
 
 # Trouve les hashs les plus proches dans la base
-def find_closest_match(image_hash, max_distance=10):
+def find_closest_matches(image_hash, max_distance=10, limit=10):
     """
-    Trouve le hash le plus proche en calculant la distance de Hamming
+    Trouve les hashs les plus proches en calculant la distance de Hamming
     Args:
         image_hash: Le hash de l'image à comparer
         max_distance: Distance maximale pour considérer un match
+        limit: Nombre maximum de résultats à retourner
     Returns:
-        Un dict (id, name, hash, distance) du match le plus proche ou None
+        Une liste de dicts (id, name, hash, distance) triés par distance
     """
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -62,24 +63,24 @@ def find_closest_match(image_hash, max_distance=10):
     conn.close()
 
     input_hash = imagehash.hex_to_hash(image_hash)
-    closest = None
-    min_distance = None
+    matches = []
     for card_id, name, card_hash in all_cards:
         try:
             db_hash = imagehash.hex_to_hash(card_hash)
             distance = input_hash - db_hash
             if distance <= max_distance:
-                if min_distance is None or distance < min_distance:
-                    min_distance = distance
-                    closest = {
-                        'id': int(card_id),
-                        'name': name,
-                        'hash': card_hash,
-                        'distance': int(distance)
-                    }
+                matches.append({
+                    'id': int(card_id),
+                    'name': name,
+                    'hash': card_hash,
+                    'distance': int(distance)
+                })
         except Exception:
             continue
-    return closest
+    
+    # Sort by distance and limit results
+    matches.sort(key=lambda x: x['distance'])
+    return matches[:limit]
 
 @app.route('/')
 def index():
@@ -110,11 +111,13 @@ def compare():
         # Comparaison avec la base - vérification exacte
         exact_match = hash_exists(image_hash)
         
-        # Trouver la correspondance la plus proche
-        closest_match = find_closest_match(image_hash, max_distance=max_distance)
+        # Trouver les correspondances les plus proches
+        closest_matches = find_closest_matches(image_hash, max_distance=max_distance, limit=10)
+        closest_match = closest_matches[0] if closest_matches else None
         
         if closest_match:
             logger.info(f"Closest match: {closest_match['name']} with distance {closest_match['distance']}")
+            logger.info(f"Total matches found: {len(closest_matches)}")
         else:
             logger.info(f"No match found within max_distance {max_distance}")
 
@@ -123,7 +126,9 @@ def compare():
             'hash': image_hash,
             'hash_type': hash_type,
             'hash_size': hash_size,
-            'closest_match': closest_match
+            'closest_match': closest_match,
+            'closest_matches': closest_matches,
+            'total_matches': len(closest_matches)
         })
     except Exception as e:
         logger.error(f"Error in /compare: {str(e)}")

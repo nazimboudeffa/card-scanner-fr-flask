@@ -152,7 +152,16 @@ async function processImage(imageBlob) {
             html += `<strong>Carte la plus proche:</strong><br>`;
             html += `Nom: ${data.closest_match.name}<br>`;
             html += `Distance: ${data.closest_match.distance}<br>`;
-            html += `Hash DB: ${data.closest_match.hash}<br>`;
+            html += `Hash DB: ${data.closest_match.hash}<br><br>`;
+        }
+
+        if (data.closest_matches && data.closest_matches.length > 0) {
+            html += `<strong>Toutes les correspondances (${data.total_matches}):</strong><br>`;
+            html += '<ul style="margin: 8px 0; padding-left: 20px;">';
+            for (const match of data.closest_matches) {
+                html += `<li><strong>${match.name}</strong> - Distance: ${match.distance}</li>`;
+            }
+            html += '</ul>';
         }
 
         result.innerHTML = html;
