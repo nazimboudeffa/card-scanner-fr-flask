@@ -72,10 +72,10 @@ def find_closest_match(image_hash, max_distance=10):
                 if min_distance is None or distance < min_distance:
                     min_distance = distance
                     closest = {
-                        'id': card_id,
+                        'id': int(card_id),
                         'name': name,
                         'hash': card_hash,
-                        'distance': distance
+                        'distance': int(distance)
                     }
         except Exception:
             continue

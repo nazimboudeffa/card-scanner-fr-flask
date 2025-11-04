@@ -176,6 +176,14 @@ select:focus, input[type="number"]:focus { border-color: var(--primary); box-sha
   aspect-ratio: 4 / 3;
   background: #000;
 }
+.video-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  background: #000;
+}
 
 .result {
   padding: 14px 16px;
