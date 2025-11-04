@@ -8,4 +8,4 @@ Ne sommes focus uniquement sur le marché français
 
 Nous supportons actuellement les éxtensions suivantes :
 
-* Méga-Évolution
+* Méga-Évolution du JCC Pokémon
