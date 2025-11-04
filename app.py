@@ -101,7 +101,7 @@ def compare():
 
         # Lecture de l'image uniquement en mémoire
         image = request.files['image']
-        pil_img = Image.open(io.BytesIO(image.read()))
+        pil_img = Image.open(io.BytesIO(image.read())).convert("RGB").resize((400, 300))
 
         # Calcul du hash
         image_hash = compute_hash(pil_img, hash_type=hash_type, hash_size=hash_size)
