@@ -164,6 +164,10 @@ async function processImage(imageBlob) {
 }
 
 captureButton.addEventListener('click', async () => {
+    // Use the actual video dimensions for the canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
