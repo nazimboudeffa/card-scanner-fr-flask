@@ -12,17 +12,16 @@ DB_PATH = "database.db"
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialise la base de données
-def init_db():
+def get_db_connection():
+    """Open a read-only connection to the existing SQLite DB.
+
+    Note: We do NOT create tables here. The DB is expected to already exist
+    with the required schema (tables: hashs, cards).
+    """
+    # Standard connection (read/write). If you want read-only, use URI mode:
+    # sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
     conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS cards
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  name TEXT,
-                  file_path TEXT,
-                  hash TEXT)''')
-    conn.commit()
-    conn.close()
+    return conn
 
 # Calcule le hash perceptuel
 def compute_hash(pil_img, hash_type="phash", hash_size=16):
@@ -38,9 +37,9 @@ def compute_hash(pil_img, hash_type="phash", hash_size=16):
 
 # Vérifie si un hash existe dans la base
 def hash_exists(image_hash):
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT id FROM cards WHERE hash=?", (image_hash,))
+    c.execute("SELECT file_name FROM hashs WHERE hash=?", (image_hash,))
     exists = c.fetchone() is not None
     conn.close()
     return exists
@@ -56,22 +55,32 @@ def find_closest_matches(image_hash, max_distance=10, limit=10):
     Returns:
         Une liste de dicts (id, name, hash, distance) triés par distance
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT id, name, hash FROM cards")
-    all_cards = c.fetchall()
+    # Join hashs with cards on file_name to retrieve card infos along with stored hash
+    c.execute(
+        """
+        SELECT h.hash, h.file_name, c.card_name, c.set_name, c.rarity
+        FROM hashs h
+        LEFT JOIN cards c ON c.file_name = h.file_name
+        """
+    )
+    all_rows = c.fetchall()
     conn.close()
 
     input_hash = imagehash.hex_to_hash(image_hash)
     matches = []
-    for card_id, name, card_hash in all_cards:
+    for card_hash, file_name, card_name, set_name, rarity in all_rows:
         try:
             db_hash = imagehash.hex_to_hash(card_hash)
             distance = input_hash - db_hash
             if distance <= max_distance:
                 matches.append({
-                    'id': int(card_id),
-                    'name': name,
+                    # Keep "name" key for frontend compatibility
+                    'name': card_name,
+                    'file_name': file_name,
+                    'set_name': set_name,
+                    'rarity': rarity,
                     'hash': card_hash,
                     'distance': int(distance)
                 })
@@ -135,5 +144,5 @@ def compare():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    init_db()  # Initialize database on startup
+    # Do NOT create or modify tables here; DB must already exist.
     app.run(host='0.0.0.0', debug=True)
