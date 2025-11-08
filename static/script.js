@@ -150,7 +150,7 @@ async function processImage(imageBlob) {
 
         if (data.closest_match) {
             html += `<strong>Carte la plus proche:</strong><br>`;
-            html += `Nom: ${data.closest_match.name_fr}<br>`;
+            html += `Nom: ${data.closest_match.name}<br>`;
             html += `Distance: ${data.closest_match.distance}<br>`;
             html += `Hash DB: ${data.closest_match.hash}<br><br>`;
         }
@@ -159,7 +159,7 @@ async function processImage(imageBlob) {
             html += `<strong>Toutes les correspondances (${data.total_matches}):</strong><br>`;
             html += '<ul style="margin: 8px 0; padding-left: 20px;">';
             for (const match of data.closest_matches) {
-                html += `<li><strong>${match.name_fr}</strong> - Distance: ${match.distance}</li>`;
+                html += `<li><strong>${match.name}</strong> - Distance: ${match.distance}</li>`;
             }
             html += '</ul>';
         }

@@ -70,14 +70,14 @@ def find_closest_matches(image_hash, max_distance=10, limit=10):
 
     input_hash = imagehash.hex_to_hash(image_hash)
     matches = []
-    for card_hash, file_name, card_name, set_name, rarity in all_rows:
+    for card_hash, file_name, name_fr, set_name, rarity in all_rows:
         try:
             db_hash = imagehash.hex_to_hash(card_hash)
             distance = input_hash - db_hash
             if distance <= max_distance:
                 matches.append({
-                    # Keep "name" key for frontend compatibility
-                    'name_fr': card_name,
+                    # Keep a stable "name" key for frontend and logs
+                    'name': name_fr,
                     'file_name': file_name,
                     'set_code': set_name,
                     'rarity_fr': rarity,
