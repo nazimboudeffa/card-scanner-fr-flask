@@ -150,7 +150,7 @@ async function processImage(imageBlob) {
 
         if (data.closest_match) {
             html += `<strong>Carte la plus proche:</strong><br>`;
-            html += `Nom: ${data.closest_match.name}<br>`;
+            html += `Nom: ${data.closest_match.name_fr}<br>`;
             html += `Distance: ${data.closest_match.distance}<br>`;
             html += `Hash DB: ${data.closest_match.hash}<br><br>`;
         }
