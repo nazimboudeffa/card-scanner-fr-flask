@@ -60,7 +60,7 @@ def find_closest_matches(image_hash, max_distance=10, limit=10):
     # Join hashs with cards on file_name to retrieve card infos along with stored hash
     c.execute(
         """
-        SELECT h.hash, h.file_name, c.card_name, c.set_name, c.rarity
+        SELECT h.hash, h.file_name, c.name_fr, c.set_code, c.rarity_fr
         FROM hashs h
         LEFT JOIN cards c ON c.file_name = h.file_name
         """
@@ -77,10 +77,10 @@ def find_closest_matches(image_hash, max_distance=10, limit=10):
             if distance <= max_distance:
                 matches.append({
                     # Keep "name" key for frontend compatibility
-                    'name': card_name,
+                    'name_fr': card_name,
                     'file_name': file_name,
-                    'set_name': set_name,
-                    'rarity': rarity,
+                    'set_code': set_name,
+                    'rarity_fr': rarity,
                     'hash': card_hash,
                     'distance': int(distance)
                 })
